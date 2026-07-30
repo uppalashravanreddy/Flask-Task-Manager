@@ -1,3 +1,9 @@
+<!-- phase-output-archive
+     phase: 7
+     name: Verification
+     archived_at: 2026-07-30T14:17:57+00:00
+     source: docs/artifacts/FLASK-001/verification_report.md
+-->
 # Verification Report — FLASK-001: Automated Documentation Sync
 
 | Field | Value |
