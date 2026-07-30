@@ -53,6 +53,20 @@ python -m pytest tests/ -v --tb=short --cov=src --cov-report=term-missing
 4. Fix the root cause — never delete a failing test.
 5. Re-run after fixing to confirm green.
 
+## Generate HTML Test Report
+
+After any test run, generate the HTML test report:
+```bash
+python scripts/test_runner.py
+```
+Opens at: `reports/test-report.html`
+
+The report includes:
+- Summary bar (total / passed / failed / errors / duration)
+- Test results table with status badges
+- Failure accordion with full tracebacks for each failed test
+- Re-run hint showing the exact `pytest --lf` command
+
 ## Required Test Coverage
 
 Every new function must have:

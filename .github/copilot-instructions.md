@@ -1,40 +1,27 @@
 # GitHub Copilot Instructions — Flask Task Manager
 
-## Project Context
-This is the Flask Task Manager repository. It contains:
-- A CRUD web app (Flask + SQLAlchemy + Flask-WTF)
-- An Automated Documentation Sync pipeline (`src/doc_sync/`) — ticket FLASK-001
-- An Agentic SDLC pipeline driving all phases from requirements to PR
+## What This Repository Is
+Flask Task Manager is a CRUD web application (Flask + SQLAlchemy + Flask-WTF) with an Automated Documentation Sync pipeline (FLASK-001) and a full Agentic SDLC pipeline managed through GitHub Copilot agents.
 
-## Agentic SDLC Pipeline
-The project uses a multi-agent SDLC pipeline managed by `.github/agents/`, `.github/prompts/`, and `.github/skills/`. Each phase has a dedicated agent and prompt. State is persisted in `.sdlc/state.json`. The orchestrator (`scripts/orchestrator.py`) coordinates phase execution.
+## Pipeline Entry Point
+- State file: `.sdlc/state.json` — always read this first
+- Orchestrator: `python scripts/orchestrator.py` — shows current phase and Copilot invocation
+- Resume: `python scripts/orchestrator.py --resume` — resumes from the interrupted phase
+- HTML dashboard: `reports/sdlc-summary.html` — visual pipeline status
 
-## Code Standards
-- Python 3.11+, Flask conventions, SQLAlchemy ORM patterns
-- All secrets must come from environment variables (never hardcoded)
-- Missing documentation values must be written as `"Not Specified"` — never inferred
-- Write `pytest` tests for every new function; place units under `tests/unit/`, integration under `tests/integration/`
-- URL route patterns must use `/resource/<id>` — never `/resource=/<id>`
-
-## File Ownership by Phase
-| SDLC Phase | Primary Output Files |
+## Instruction Files (load before any phase)
+| File | Purpose |
 |---|---|
-| 1 — Requirements | `docs/artifacts/FLASK-001/requirements.md` |
-| 2 — Architecture | `docs/artifacts/FLASK-001/architecture.md` |
-| 3 — Design Review | `docs/artifacts/FLASK-001/design-review.md` |
-| 4 — Impl Planning | `docs/artifacts/FLASK-001/impl-plan.md` |
-| 5 — Implementation | `src/doc_sync/`, `scripts/`, `tests/` |
-| 6 — Code Review | `docs/artifacts/FLASK-001/review_report.md` |
-| 7 — Verification | `tests/`, test run output |
-| 8 — PR | Pull Request on GitHub |
+| `#file:.github/instructions/00-project-context.md` | Project facts, repo map, known bugs |
+| `#file:.github/instructions/01-coding-standards.md` | Python code rules |
+| `#file:.github/instructions/02-testing-standards.md` | Test writing and running rules |
+| `#file:.github/instructions/03-security-standards.md` | Secrets, protected files, output rules |
+| `#file:.github/instructions/04-failure-handling.md` | Retry policy, resume logic, escalation |
 
-## Skills Available
-Reference these skill files in your instructions:
-- `#file:.github/skills/analyze-codebase.md` — how to read and parse this codebase
-- `#file:.github/skills/generate-docs.md` — documentation formatting rules
-- `#file:.github/skills/run-tests.md` — how to run and interpret tests
-- `#file:.github/skills/git-operations.md` — staging, committing, branching
-- `#file:.github/skills/sdlc-state.md` — reading and advancing pipeline state
+## Available Agents
+`@orchestrator` — master agent, runs the whole pipeline. All other agents are invoked by it.
 
-## State Management
-Always read `.sdlc/state.json` before starting any phase action. Use `scripts/state_manager.py` to transition phases; do not manually edit `state.json`.
+Sub-agents (also invokable directly): `@requirements`, `@architecture`, `@design-review`, `@impl-planning`, `@implementation`, `@code-review`, `@verification`, `@pr`
+
+## Skills
+`#file:.github/skills/analyze-codebase.md` | `#file:.github/skills/generate-docs.md` | `#file:.github/skills/run-tests.md` | `#file:.github/skills/git-operations.md` | `#file:.github/skills/sdlc-state.md`
