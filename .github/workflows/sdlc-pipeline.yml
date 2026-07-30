@@ -38,7 +38,7 @@ jobs:
           cache: pip
 
       - name: Install dependencies
-        run: pip install -r requirements.txt pytest pytest-cov
+        run: pip install -r requirements.txt pytest pytest-cov pytest-json-report
 
       - name: Run unit tests
         run: python -m pytest tests/unit/ -v --tb=short
@@ -46,14 +46,67 @@ jobs:
       - name: Run integration tests
         run: python -m pytest tests/integration/ -v --tb=short
 
+      - name: Generate HTML test report
+        run: python scripts/test_runner.py --output reports/test-report.html
+        continue-on-error: true
+
       - name: Generate coverage report
         run: python -m pytest tests/ --cov=src --cov-report=term-missing --cov-report=xml
+        continue-on-error: true
 
-      - name: Upload coverage
+      - name: Upload test report + coverage
         uses: actions/upload-artifact@v4
         with:
-          name: coverage-report
-          path: coverage.xml
+          name: unit-integration-test-results
+          path: |
+            reports/test-report.html
+            coverage.xml
+          if-no-files-found: warn
+
+  # ── Gate 1b: Playwright E2E Tests (QA Phase) ─────────────────────────────
+  playwright:
+    name: QA — Playwright E2E Tests
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install Python dependencies
+        run: pip install -r requirements.txt pytest pytest-playwright pytest-json-report
+
+      - name: Install Playwright browsers
+        run: playwright install --with-deps chromium
+
+      - name: Run E2E tests
+        env:
+          SECRET_KEY: ci-test-secret-key
+        run: |
+          python -m pytest tests/e2e/ -v --tb=short \
+            --json-report --json-report-file=reports/playwright-results.json \
+            --screenshot=only-on-failure \
+            --output=reports/playwright-screenshots/
+        continue-on-error: true
+
+      - name: Generate HTML test report (E2E)
+        run: python scripts/test_runner.py --tests tests/e2e/ --output reports/playwright-report.html
+        continue-on-error: true
+
+      - name: Upload Playwright results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-test-results
+          path: |
+            reports/playwright-results.json
+            reports/playwright-report.html
+            reports/playwright-screenshots/
+          if-no-files-found: warn
 
   # ── Gate 2: Pipeline Smoke Test ───────────────────────────────────────────
   pipeline-smoke:

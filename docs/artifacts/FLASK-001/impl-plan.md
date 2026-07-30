@@ -1,0 +1,78 @@
+# Implementation Plan — FLASK-001: Automated Documentation Sync
+
+| Field | Value |
+|---|---|
+| Ticket ID | FLASK-001 |
+| Phase | 4 — Implementation Planning |
+| Status | Draft |
+| Author | GitHub Copilot (impl-planning agent) |
+| Date | 2026-07-30 |
+
+## 1. Task List (dependency order)
+
+### TASK-01: Package exports and CLI entry point
+- **File(s):** src/doc_sync/__init__.py, src/main.py
+- **Description:** Expose the doc_sync package entry points and add CLI argument support for repository and output paths so the pipeline can be invoked from the command line. This task is already implemented and verified by the current tests.
+- **Blocked By:** None
+- **Estimate:** S
+- **Definition of Done:**
+  - [x] `collect_repository_facts` and `generate_problem_spec` are importable from `src.doc_sync`
+  - [x] `python src/main.py --repo-path . --output-path <path>` runs successfully
+  - [x] pytest test_doc_sync passes
+
+### TASK-02: Repository scanning
+- **File(s):** src/doc_sync/repo_scanner.py
+- **Description:** Read the approved repo files and return their contents while handling missing files gracefully.
+- **Blocked By:** None
+- **Estimate:** S
+- **Definition of Done:**
+  - [x] Scans README.md, requirements.txt, app.py, models.py, routes.py, and forms.py
+  - [x] Returns empty content for missing files instead of raising errors
+  - [x] pytest test_repo_scanner passes
+
+### TASK-03: Fact extraction and Strict Fact Mode
+- **File(s):** src/doc_sync/extractor.py
+- **Description:** Extract structured facts from repository files and replace missing values with "Not Specified".
+- **Blocked By:** TASK-02
+- **Estimate:** M
+- **Definition of Done:**
+  - [x] Extracts project name, stack, entry point, data model, routes, forms, dependencies, and versions
+  - [x] Uses "Not Specified" for missing values
+  - [x] pytest test_extractor passes
+
+### TASK-04: Technical profile page creation
+- **File(s):** src/doc_sync/page_creator.py
+- **Description:** Render the extracted facts into a Markdown technical profile page for documentation output.
+- **Blocked By:** TASK-03
+- **Estimate:** S
+- **Definition of Done:**
+  - [x] Produces a Markdown page with the required sections
+  - [x] Includes "Not Specified" where content is missing
+  - [x] pytest test_doc_sync passes
+
+### TASK-05: End-to-end pipeline orchestration
+- **File(s):** src/main.py
+- **Description:** Orchestrate the scan, extraction, and page creation workflow from a single command and write the report to disk.
+- **Blocked By:** TASK-01, TASK-02, TASK-03, TASK-04
+- **Estimate:** M
+- **Definition of Done:**
+  - [x] `run_pipeline` writes a report to the requested output path
+  - [x] Integration tests pass
+  - [x] CLI invocation writes the report successfully
+
+## 2. Dependency Graph
+TASK-01 --> TASK-02 --> TASK-03 --> TASK-04 --> TASK-05
+
+## 3. Blocked Tasks Summary
+| Task | Blocked By | Reason |
+|---|---|---|
+| None | — | All planned implementation work is now represented by completed or verified tasks. |
+
+## 4. Test Plan Overview
+| Task | Test File | Test Type | Happy Path | Edge Case |
+|---|---|---|---|---|
+| TASK-01 | tests/unit/test_doc_sync.py | Unit | Import package entry points | Missing repo path |
+| TASK-02 | tests/unit/test_repo_scanner.py | Unit | Read canonical repository files | Missing files |
+| TASK-03 | tests/unit/test_extractor.py | Unit | Extract metadata from sample repo files | Missing fields |
+| TASK-04 | tests/unit/test_doc_sync.py | Unit | Format a technical profile page | Missing values |
+| TASK-05 | tests/integration/test_pipeline.py | Integration | Run end-to-end pipeline | Output path handling |

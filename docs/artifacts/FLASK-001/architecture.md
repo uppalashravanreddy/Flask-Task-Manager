@@ -1,0 +1,74 @@
+# Architecture — FLASK-001: Automated Documentation Sync
+
+| Field | Value |
+|---|---|
+| Ticket ID | FLASK-001 |
+| Phase | 2 — Architecture |
+| Status | Draft |
+| Author | GitHub Copilot (architecture agent) |
+| Date | 2026-07-30 |
+
+## 1. Architecture Summary
+The documentation sync feature will follow a lightweight three-stage pipeline: repository scanning, structured fact extraction, and technical profile page generation. This design stays local-first, uses Python modules already present in the repository, and keeps the generation process grounded in repository evidence rather than assumptions.
+
+## 2. Component Diagram
+```text
++------------------+    +------------------+    +------------------+
+|  RepoScanner     | -> |  Extractor       | -> |  PageCreator     |
+|  repo_scanner.py |    |  extractor.py    |    |  page_creator.py |
++------------------+    +------------------+    +------------------+
+         ^                                               |
+   Repository Files                        docs/artifacts/FLASK-001/
+```
+
+## 3. Component Responsibilities
+| Component File | Class / Function | Responsibility |
+|---|---|---|
+| src/doc_sync/repo_scanner.py | read_repository_files, get_scan_targets | Read the approved repository files and return their contents in a normalized structure. |
+| src/doc_sync/extractor.py | RepositoryExtractor.extract | Normalize scanned content, enforce Strict Fact Mode, and produce structured documentation facts. |
+| src/doc_sync/page_creator.py | build_technical_profile_page | Render the extracted facts into a Markdown technical profile suitable for future publication. |
+| src/doc_sync/__init__.py | package exports | Expose the doc_sync package entry points and make the modules importable as a package. |
+| src/main.py | run_pipeline, main | Orchestrate the full workflow from CLI invocation through report generation and route configuration. |
+
+## 4. Execution Data Flow
+1. Developer runs: python src/main.py --repo-path . --output-path <path>
+2. The CLI resolves the repository root and output path, validates them, and begins the pipeline.
+3. The repository scanner reads the approved files and captures their content.
+4. The extractor parses the scanned content and transforms it into structured facts using Strict Fact Mode.
+5. The page creator formats the facts into a Markdown technical profile page.
+6. If scanning or extraction fails, the pipeline writes a fallback error report into the documentation artifact directory instead of crashing silently.
+7. The generated artifact is written under docs/artifacts/FLASK-001/ for review and later publication.
+
+## 5. Technology Choices
+| Area | Choice | Rationale |
+|---|---|---|
+| Language | Python 3.11 | Matches the repository stack and supports fast local scripting. |
+| Repository parsing | pathlib and regular expressions | Lightweight built-in approach suitable for repository scanning. |
+| Content normalization | ast and string parsing | Enables structured extraction from Python source with minimal dependencies. |
+| Output format | Markdown | Portable and easy to review before Confluence publication. |
+| Local execution state | SQLite | Fits the requirement for lightweight local persistence and aligns with existing repository usage. |
+| Secret handling | Environment variables / .env | Keeps credentials and secrets out of source control. |
+
+## 6. Security Design
+The pipeline will keep all generated output confined to the documentation artifact directory under docs/artifacts/FLASK-001/. Any future Confluence credentials or tokens must be loaded from environment variables or a local .env file and never committed. The Flask app should also stop hardcoding secrets such as SECRET_KEY and instead read them from environment configuration during implementation. The implementation must avoid including secrets, PII, or unapproved repository content in generated artifacts. Missing values will be explicitly written as "Not Specified" rather than inferred.
+
+## 7. Architecture Decision Records
+### ADR-001: SQLite for local execution state
+- Status: Accepted
+- Context: The documentation pipeline may need lightweight runtime metadata such as run timestamps, output references, or execution summaries without introducing a separate service.
+- Decision: Use SQLite as the local execution-state store for the feature.
+- Consequences: Pros — simple setup, no extra infrastructure, fits the repository’s existing local-file style. Cons — limited scalability and not suitable for multi-user or distributed usage.
+
+## 8. Risk Register
+| Risk | Impact | Mitigation |
+|---|---|---|
+| The repository may contain files beyond the six listed in the requirements, which could change extraction behavior. | Medium | Keep the initial scan list explicit and make it easy to extend later. |
+| The implementation may drift from the repository evidence if the extractor becomes too permissive. | High | Enforce Strict Fact Mode and use explicit "Not Specified" handling. |
+| The current CLI surface and secret handling do not yet match the requirements. | High | Implement `--repo-path` and `--output-path` arguments and move secret loading to environment-based configuration. |
+| Confluence publishing requirements are not yet fully defined. | Medium | Isolate publishing concerns behind configuration and leave them out of the initial local-only implementation. |
+
+## 9. Acceptance Criteria
+- The design uses a three-stage pipeline with repository scanning, extraction, and page creation.
+- The component diagram uses actual repository file names.
+- The architecture documents security handling, execution flow, and an ADR.
+- The design includes a risk register with at least one explicit mitigation.
