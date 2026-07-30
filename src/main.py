@@ -68,10 +68,15 @@ def main(argv: Optional[list[str]] = None) -> int:
     """CLI entry point for the documentation sync pipeline."""
     parser = argparse.ArgumentParser(description="Generate a technical profile report from a repository")
     parser.add_argument("repo_dir", nargs="?", default=".", help="Path to the repository to scan")
+    parser.add_argument("--repo-path", "--repo", dest="repo_path", default=None, help="Path to the repository to scan")
+    parser.add_argument("--output-path", "--output", dest="output_path", default=None, help="Path to the generated technical profile report")
     args = parser.parse_args(argv)
 
+    repo_dir = args.repo_path or args.repo_dir
+    output_path = args.output_path
+
     try:
-        run_pipeline(args.repo_dir)
+        run_pipeline(repo_dir, output_path=output_path)
     except Exception as exc:  # pragma: no cover - defensive error handling
         LOGGER.exception("CLI execution failed: %s", exc)
         return 1

@@ -1,0 +1,231 @@
+name: Agentic SDLC Pipeline — FLASK-001
+
+on:
+  workflow_dispatch:
+    inputs:
+      phase:
+        description: "SDLC phase to report on (1-8, or 'all')"
+        required: false
+        default: "all"
+  push:
+    branches:
+      - "feat/FLASK-001-doc-sync"
+    paths:
+      - "src/doc_sync/**"
+      - "scripts/**"
+      - "tests/**"
+      - "docs/artifacts/FLASK-001/**"
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "src/doc_sync/**"
+      - "scripts/**"
+      - "tests/**"
+
+jobs:
+  # ── Gate 1: Tests ─────────────────────────────────────────────────────────
+  test:
+    name: Test Suite (Unit + Integration)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt pytest pytest-cov pytest-json-report
+
+      - name: Run unit tests
+        run: python -m pytest tests/unit/ -v --tb=short
+
+      - name: Run integration tests
+        run: python -m pytest tests/integration/ -v --tb=short
+
+      - name: Generate HTML test report
+        run: python scripts/test_runner.py --output reports/test-report.html
+        continue-on-error: true
+
+      - name: Generate coverage report
+        run: python -m pytest tests/ --cov=src --cov-report=term-missing --cov-report=xml
+        continue-on-error: true
+
+      - name: Upload test report + coverage
+        uses: actions/upload-artifact@v4
+        with:
+          name: unit-integration-test-results
+          path: |
+            reports/test-report.html
+            coverage.xml
+          if-no-files-found: warn
+
+  # ── Gate 1b: Playwright E2E Tests (QA Phase) ─────────────────────────────
+  playwright:
+    name: QA — Playwright E2E Tests
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install Python dependencies
+        run: pip install -r requirements.txt pytest pytest-playwright pytest-json-report
+
+      - name: Install Playwright browsers
+        run: playwright install --with-deps chromium
+
+      - name: Run E2E tests
+        env:
+          SECRET_KEY: ci-test-secret-key
+        run: |
+          python -m pytest tests/e2e/ -v --tb=short \
+            --json-report --json-report-file=reports/playwright-results.json \
+            --screenshot=only-on-failure \
+            --output=reports/playwright-screenshots/
+        continue-on-error: true
+
+      - name: Generate HTML test report (E2E)
+        run: python scripts/test_runner.py --tests tests/e2e/ --output reports/playwright-report.html
+        continue-on-error: true
+
+      - name: Upload Playwright results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-test-results
+          path: |
+            reports/playwright-results.json
+            reports/playwright-report.html
+            reports/playwright-screenshots/
+          if-no-files-found: warn
+
+  # ── Gate 2: Pipeline Smoke Test ───────────────────────────────────────────
+  pipeline-smoke:
+    name: Documentation Sync Pipeline (end-to-end)
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run documentation sync pipeline
+        run: |
+          python src/main.py --repo . --output docs/artifacts/FLASK-001/technical_profile_report.md
+          echo "Exit code: $?"
+
+      - name: Validate generated document
+        run: |
+          python - <<'EOF'
+          from pathlib import Path
+          import sys
+
+          report = Path("docs/artifacts/FLASK-001/technical_profile_report.md")
+          if not report.exists():
+              print("FAIL: technical_profile_report.md not created")
+              sys.exit(1)
+
+          content = report.read_text()
+          required_sections = [
+              "Overview", "Technical Stack", "Entry Point",
+              "Data Model", "Routes", "Forms", "Dependencies"
+          ]
+          missing = [s for s in required_sections if s not in content]
+          if missing:
+              print(f"FAIL: missing sections: {missing}")
+              sys.exit(1)
+
+          if report.stat().st_size < 500:
+              print(f"FAIL: report too small ({report.stat().st_size} bytes)")
+              sys.exit(1)
+
+          print(f"PASS: report valid ({report.stat().st_size} bytes, all sections present)")
+          EOF
+
+      - name: Upload generated report
+        uses: actions/upload-artifact@v4
+        with:
+          name: technical-profile-report
+          path: docs/artifacts/FLASK-001/technical_profile_report.md
+
+  # ── Gate 3: SDLC HTML Reports ─────────────────────────────────────────────
+  sdlc-report:
+    name: SDLC Pipeline HTML Reports
+    runs-on: ubuntu-latest
+    needs: [test, pipeline-smoke]
+    if: always()
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt pytest pytest-json-report -q
+
+      - name: Generate SDLC pipeline summary HTML
+        run: python scripts/html_report.py --output reports/sdlc-summary.html
+
+      - name: Generate test HTML report
+        run: python scripts/test_runner.py --output reports/test-report.html
+        continue-on-error: true
+
+      - name: Upload HTML reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: sdlc-html-reports
+          path: reports/
+          if-no-files-found: warn
+
+      - name: Upload SDLC phase outputs
+        uses: actions/upload-artifact@v4
+        with:
+          name: sdlc-phase-outputs
+          path: .sdlc/phase-outputs/
+          if-no-files-found: ignore
+
+  # ── Gate 4: Security Check ────────────────────────────────────────────────
+  security:
+    name: Security — No Hardcoded Secrets
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check for hardcoded secrets in source files
+        run: |
+          echo "Checking for hardcoded SECRET_KEY..."
+          if grep -rn "secret-key\|SECRET_KEY\s*=\s*['\"][^\"']*['\"]" \
+               --include="*.py" \
+               --exclude-dir=".git" \
+               --exclude-dir="tests" .; then
+            echo "FAIL: hardcoded secret detected"
+            exit 1
+          fi
+          echo "PASS: no hardcoded secrets found in production code"
+
+      - name: Check .env is not tracked
+        run: |
+          if git ls-files | grep -q "^\.env$"; then
+            echo "FAIL: .env file is tracked in git"
+            exit 1
+          fi
+          echo "PASS: .env is not tracked"

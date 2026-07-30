@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+# Git post-commit hook — runs after every successful commit.
+# Regenerates the SDLC pipeline HTML report so it reflects the latest committed state.
+
+set -uo pipefail
+
+if command -v python &>/dev/null && [ -f "scripts/html_report.py" ]; then
+  python scripts/html_report.py 2>/dev/null && \
+    echo "[SDLC] HTML report refreshed: reports/sdlc-summary.html" || true
+fi
+exit 0
