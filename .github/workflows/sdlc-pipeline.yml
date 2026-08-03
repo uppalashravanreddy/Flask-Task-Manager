@@ -168,7 +168,7 @@ jobs:
   sdlc-report:
     name: SDLC Pipeline HTML Reports
     runs-on: ubuntu-latest
-    needs: [test, pipeline-smoke]
+    needs: [test, playwright, pipeline-smoke]
     if: always()
     steps:
       - uses: actions/checkout@v4
@@ -182,11 +182,21 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt pytest pytest-json-report -q
 
+      - name: Download Playwright results
+        uses: actions/download-artifact@v4
+        with:
+          name: playwright-test-results
+          path: reports/
+        continue-on-error: true
+
       - name: Generate SDLC pipeline summary HTML
         run: python scripts/html_report.py --output reports/sdlc-summary.html
 
-      - name: Generate test HTML report
-        run: python scripts/test_runner.py --output reports/test-report.html
+      - name: Generate unified test HTML report (unit + integration + playwright)
+        run: |
+          python scripts/test_runner.py \
+            --output reports/test-report.html \
+            --playwright-json reports/playwright-results.json
         continue-on-error: true
 
       - name: Upload HTML reports

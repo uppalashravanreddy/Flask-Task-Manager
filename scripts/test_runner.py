@@ -4,6 +4,7 @@ Usage:
     python scripts/test_runner.py
     python scripts/test_runner.py --output reports/test-report.html
     python scripts/test_runner.py --tests tests/unit/
+    python scripts/test_runner.py --playwright-json reports/playwright-results.json
 """
 from __future__ import annotations
 
@@ -17,13 +18,14 @@ from pathlib import Path
 ROOT = Path(__file__).parent.parent
 DEFAULT_OUTPUT = ROOT / "reports" / "test-report.html"
 JSON_TMP = ROOT / "reports" / ".pytest-results.json"
+DEFAULT_TESTS = ["tests/unit/", "tests/integration/"]
 
 
-def _run_pytest(test_path: str) -> dict:
+def _run_pytest(test_paths: list[str]) -> dict:
     JSON_TMP.parent.mkdir(parents=True, exist_ok=True)
     cmd = [
-        sys.executable, "-m", "pytest", test_path,
-        f"--json-report", f"--json-report-file={JSON_TMP}",
+        sys.executable, "-m", "pytest", *test_paths,
+        "--json-report", f"--json-report-file={JSON_TMP}",
         "-v", "--tb=short", "-q",
     ]
     try:
@@ -35,8 +37,8 @@ def _run_pytest(test_path: str) -> dict:
         return json.loads(JSON_TMP.read_text(encoding="utf-8"))
 
     cmd_fallback = [
-        sys.executable, "-m", "pytest", test_path, "-v", "--tb=short",
-        "--no-header", "-rN",
+        sys.executable, "-m", "pytest", *test_paths,
+        "-v", "--tb=short", "--no-header", "-rN",
     ]
     result = subprocess.run(
         cmd_fallback, cwd=ROOT, capture_output=True, text=True,
@@ -44,6 +46,17 @@ def _run_pytest(test_path: str) -> dict:
     )
     return {"_raw_stdout": result.stdout, "_raw_stderr": result.stderr,
             "_returncode": result.returncode}
+
+
+def _load_playwright_results(json_path: Path) -> list[dict]:
+    """Load test results from a pytest-json-report playwright output file."""
+    if not json_path.exists():
+        return []
+    try:
+        data = json.loads(json_path.read_text(encoding="utf-8"))
+        return data.get("tests", [])
+    except Exception:
+        return []
 
 
 def _status_badge(outcome: str) -> str:
@@ -67,18 +80,18 @@ def _escape(text: str) -> str:
     )
 
 
-def _build_from_json(data: dict, ts: str) -> str:
-    summary = data.get("summary", {})
-    total    = summary.get("total", 0)
-    passed   = summary.get("passed", 0)
-    failed   = summary.get("failed", 0)
-    errors   = summary.get("error", 0)
-    skipped  = summary.get("skipped", 0)
-    duration = round(data.get("duration", 0), 2)
-
-    tests = data.get("tests", [])
+def _render_tests(tests: list[dict], section_label: str = "") -> tuple[str, str]:
+    """Return (rows_html, accordion_html) for a list of test result dicts."""
     rows = []
     accordions = []
+
+    if section_label:
+        rows.append(
+            f'<tr><td colspan="4" style="background:#161b22;color:#8b949e;'
+            f'font-weight:600;font-size:11px;text-transform:uppercase;'
+            f'letter-spacing:0.05em;padding:6px 10px;">'
+            f'{_escape(section_label)}</td></tr>'
+        )
 
     for t in tests:
         nodeid   = t.get("nodeid", "")
@@ -111,31 +124,76 @@ def _build_from_json(data: dict, ts: str) -> str:
             <pre class="traceback">{tb_html}</pre>
           </details>""")
 
-    rows_html = "\n".join(rows)
-    accordion_html = "\n".join(accordions)
+    return "\n".join(rows), "\n".join(accordions)
+
+
+def _build_from_json(data: dict, playwright_tests: list[dict], ts: str) -> str:
+    summary  = data.get("summary", {})
+    total    = summary.get("total", 0)
+    passed   = summary.get("passed", 0)
+    failed   = summary.get("failed", 0)
+    errors   = summary.get("error", 0)
+    skipped  = summary.get("skipped", 0)
+    duration = round(data.get("duration", 0), 2)
+
+    unit_tests = data.get("tests", [])
+
+    # Merge playwright counts
+    pw_passed  = sum(1 for t in playwright_tests if t.get("outcome") == "passed")
+    pw_failed  = sum(1 for t in playwright_tests if t.get("outcome") in ("failed", "error"))
+    pw_skipped = sum(1 for t in playwright_tests if t.get("outcome") == "skipped")
+
+    grand_total   = total + len(playwright_tests)
+    grand_passed  = passed + pw_passed
+    grand_failed  = failed + errors + pw_failed
+    grand_skipped = skipped + pw_skipped
+
+    unit_rows, unit_accordions = _render_tests(
+        unit_tests,
+        "Unit + Integration Tests" if playwright_tests else "",
+    )
+    pw_rows, pw_accordions = _render_tests(playwright_tests, "E2E — Playwright Tests")
+
+    rows_html      = unit_rows + ("\n" + pw_rows if playwright_tests else "")
+    accordion_html = unit_accordions + ("\n" + pw_accordions if playwright_tests else "")
+
     failures_section = ""
-    if accordions:
+    if accordion_html.strip():
         failures_section = f"""
     <div class="section-title">Failure Details</div>
     <div class="accordions">{accordion_html}</div>
     <div class="rerun-hint">
-      Re-run failures only:
-      <code>python -m pytest --lf -v</code>
+      Re-run failures only: <code>python -m pytest --lf -v</code>
+    </div>"""
+
+    # E2E summary bar
+    e2e_bar = ""
+    if playwright_tests:
+        e2e_color = "#3fb950" if pw_failed == 0 else "#f85149"
+        e2e_label = "ALL PASSING" if pw_failed == 0 else f"{pw_failed} FAILING"
+        e2e_bar = f"""
+    <div class="section-title">E2E (Playwright) Summary</div>
+    <div class="summary-bar">
+      <div class="stat"><span class="stat-val">{len(playwright_tests)}</span><span class="stat-lbl">Total</span></div>
+      <div class="stat"><span class="stat-val" style="color:#3fb950;">{pw_passed}</span><span class="stat-lbl">Passed</span></div>
+      <div class="stat"><span class="stat-val" style="color:#f85149;">{pw_failed}</span><span class="stat-lbl">Failed</span></div>
+      <div class="stat"><span class="stat-val" style="color:#e3b341;">{pw_skipped}</span><span class="stat-lbl">Skipped</span></div>
+      <div class="stat"><span class="stat-val" style="color:{e2e_color};">{e2e_label}</span><span class="stat-lbl">Result</span></div>
     </div>"""
 
     return _wrap_html(
         ts=ts,
-        total=total, passed=passed, failed=failed,
-        errors=errors, skipped=skipped, duration=duration,
+        total=grand_total, passed=grand_passed, failed=grand_failed,
+        skipped=grand_skipped, duration=duration,
         rows_html=rows_html,
         failures_section=failures_section,
+        e2e_summary=e2e_bar,
     )
 
 
-def _build_from_raw(data: dict, ts: str) -> str:
+def _build_from_raw(data: dict, playwright_tests: list[dict], ts: str) -> str:
     stdout = data.get("_raw_stdout", "")
     stderr = data.get("_raw_stderr", "")
-    rc     = data.get("_returncode", -1)
 
     passed = stdout.count(" PASSED")
     failed = stdout.count(" FAILED") + stdout.count(" ERROR")
@@ -144,22 +202,33 @@ def _build_from_raw(data: dict, ts: str) -> str:
       <pre style="font-size:12px;white-space:pre-wrap;">{raw_html}</pre>
     </td></tr>"""
 
+    if playwright_tests:
+        pw_rows, _ = _render_tests(playwright_tests, "E2E — Playwright Tests")
+        rows_html += "\n" + pw_rows
+
+    pw_count  = len(playwright_tests)
+    pw_passed = sum(1 for t in playwright_tests if t.get("outcome") == "passed")
+
     return _wrap_html(
         ts=ts,
-        total=passed + failed, passed=passed, failed=failed,
-        errors=0, skipped=0, duration=0,
+        total=passed + failed + pw_count,
+        passed=passed + pw_passed,
+        failed=failed + (pw_count - pw_passed),
+        skipped=0, duration=0,
         rows_html=rows_html,
         failures_section="",
+        e2e_summary="",
     )
 
 
 def _wrap_html(
     ts: str, total: int, passed: int, failed: int,
-    errors: int, skipped: int, duration: float,
+    skipped: int, duration: float,
     rows_html: str, failures_section: str,
+    e2e_summary: str = "",
 ) -> str:
-    overall_color = "#3fb950" if failed == 0 and errors == 0 else "#f85149"
-    overall_label = "ALL PASSING" if failed == 0 and errors == 0 else f"{failed + errors} FAILING"
+    overall_color = "#3fb950" if failed == 0 else "#f85149"
+    overall_label = "ALL PASSING" if failed == 0 else f"{failed} FAILING"
 
     return f"""<!DOCTYPE html>
 <html lang="en">
@@ -218,16 +287,17 @@ def _wrap_html(
       <div class="sub">FLASK-001 &mdash; Automated Documentation Sync &nbsp;|&nbsp; {ts}</div>
     </div>
 
-    <div class="section-title">Summary</div>
+    <div class="section-title">Overall Summary</div>
     <div class="summary-bar">
       <div class="stat"><span class="stat-val">{total}</span><span class="stat-lbl">Total</span></div>
       <div class="stat"><span class="stat-val" style="color:#3fb950;">{passed}</span><span class="stat-lbl">Passed</span></div>
       <div class="stat"><span class="stat-val" style="color:#f85149;">{failed}</span><span class="stat-lbl">Failed</span></div>
-      <div class="stat"><span class="stat-val" style="color:#f85149;">{errors}</span><span class="stat-lbl">Errors</span></div>
       <div class="stat"><span class="stat-val" style="color:#e3b341;">{skipped}</span><span class="stat-lbl">Skipped</span></div>
       <div class="stat"><span class="stat-val">{duration}s</span><span class="stat-lbl">Duration</span></div>
       <div class="stat"><span class="stat-val" style="color:{overall_color};">{overall_label}</span><span class="stat-lbl">Result</span></div>
     </div>
+
+    {e2e_summary}
 
     <div class="section-title">Test Results</div>
     <table>
@@ -250,8 +320,10 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", default=str(DEFAULT_OUTPUT),
                         help="Output HTML path")
-    parser.add_argument("--tests", default="tests/",
-                        help="Test path to pass to pytest (default: tests/)")
+    parser.add_argument("--tests", nargs="+", default=DEFAULT_TESTS,
+                        help="Test paths to pass to pytest (default: tests/unit/ tests/integration/)")
+    parser.add_argument("--playwright-json", default=None,
+                        help="Path to playwright pytest-json-report JSON file to merge into report")
     args = parser.parse_args()
 
     try:
@@ -265,10 +337,16 @@ def main() -> None:
     ts = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
     data = _run_pytest(args.tests)
 
+    # Load playwright results if provided or auto-detect
+    pw_json_path = Path(args.playwright_json) if args.playwright_json else ROOT / "reports" / "playwright-results.json"
+    playwright_tests = _load_playwright_results(pw_json_path)
+    if playwright_tests:
+        print(f"Merged {len(playwright_tests)} Playwright test results from {pw_json_path}")
+
     if "_raw_stdout" in data:
-        html = _build_from_raw(data, ts)
+        html = _build_from_raw(data, playwright_tests, ts)
     else:
-        html = _build_from_json(data, ts)
+        html = _build_from_json(data, playwright_tests, ts)
 
     out = Path(args.output)
     out.parent.mkdir(parents=True, exist_ok=True)
@@ -277,10 +355,12 @@ def main() -> None:
 
     summary = data.get("summary", {})
     failed  = summary.get("failed", 0) + summary.get("error", 0)
-    if failed:
-        print(f"WARNING: {failed} test(s) failed — see {out}")
+    pw_failed = sum(1 for t in playwright_tests if t.get("outcome") in ("failed", "error"))
+    total_failed = failed + pw_failed
+    if total_failed:
+        print(f"WARNING: {total_failed} test(s) failed — see {out}")
     else:
-        print(f"All tests passed.")
+        print("All tests passed.")
 
 
 if __name__ == "__main__":
