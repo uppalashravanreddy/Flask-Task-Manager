@@ -6,6 +6,7 @@ tools:
   - write_file
   - run_in_terminal
   - get_errors
+  - jira
 ---
 
 # Orchestrator Agent
