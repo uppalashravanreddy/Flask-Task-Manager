@@ -1,0 +1,19 @@
+{
+  "servers": {
+    "atlassian": {
+      "type": "stdio",
+      "command": "powershell",
+      "args": [
+        "-ExecutionPolicy", "Bypass",
+        "-File", "${workspaceFolder}/scripts/start-jira-mcp.ps1"
+      ],
+      "cwd": "${workspaceFolder}"
+    },
+    "playwright": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["@playwright/mcp@latest", "--headless"],
+      "cwd": "${workspaceFolder}"
+    }
+  }
+}
