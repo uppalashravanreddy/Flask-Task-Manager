@@ -4,8 +4,16 @@
   {% for task in tasks %}
     <div class="card">
       <div class="card-body">
-        <h3>{{ task.title }}</h3>
-        <p>Added on:  {{ task.date }}</p>
+        <h3>{{ task.title }}
+          {% if task.priority == 'High' %}
+            <span class="badge badge-danger">High</span>
+          {% elif task.priority == 'Low' %}
+            <span class="badge badge-success">Low</span>
+          {% else %}
+            <span class="badge badge-warning">Medium</span>
+          {% endif %}
+        </h3>
+        <p>Added on: {{ task.date }}</p>
         <hr>
         <p>Description: {{task.desc}} </p>
         <a href="{{url_for('edit', task_id=task.id)}}" class="btn btn-primary">Edit</a>
