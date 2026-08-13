@@ -112,8 +112,9 @@ tasks = sorted(Task.query.all(), key=lambda t: PRIORITY_RANK.get(t.priority, 2))
   1. Connect to `instance/data.db`.
   2. Check if column `priority` already exists (idempotent guard).
   3. If absent, execute `ALTER TABLE task ADD COLUMN priority TEXT DEFAULT 'Medium'`.
-  4. Commit and close.
-- **Result:** All existing rows receive `priority = 'Medium'` automatically via the SQL default.
+  4. Execute `UPDATE task SET priority = 'Medium' WHERE priority IS NULL` to backfill any pre-existing rows that hold NULL (rows inserted before the migration ran).
+  5. Commit and close.
+- **Result:** All existing rows receive `priority = 'Medium'` — new rows via the SQL column default, pre-existing NULL rows via the explicit UPDATE backfill.
 
 ---
 
