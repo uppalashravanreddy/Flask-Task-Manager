@@ -43,7 +43,7 @@ def _extract_counts(html_path: Path) -> dict:
 
 
 def generate(ticket_id: str) -> Path:
-    base = Path("reports") / ticket_id
+    base = Path(".claude") / "reports" / ticket_id
     base.mkdir(parents=True, exist_ok=True)
 
     unit_path = base / "unit-report.html"

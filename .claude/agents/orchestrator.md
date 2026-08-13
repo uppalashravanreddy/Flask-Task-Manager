@@ -1,4 +1,4 @@
----
+﻿---
 name: orchestrator
 description: Master orchestrator that drives the full SDLC pipeline (Phases 1–8, with Phase 7 as a 5-step testing sub-pipeline). Maintains state.json, handles feedback loops, and reports to the user after each phase.
 ---
@@ -67,17 +67,17 @@ Record every feedback loop in state.json `feedback_loops[]`.
   "branch": "feature/KAN-XX-slug",
   "current_phase": "7.3",
   "phases": {
-    "1":   {"status": "complete", "output": "docs/artifacts/KAN-XX/requirements.md"},
-    "2":   {"status": "complete", "output": "docs/artifacts/KAN-XX/architecture.md"},
-    "3":   {"status": "complete", "output": "docs/artifacts/KAN-XX/design-review.md"},
-    "4":   {"status": "complete", "output": "docs/artifacts/KAN-XX/impl-plan.md"},
+    "1":   {"status": "complete", "output": ".claude/artifacts/KAN-XX/requirements.md"},
+    "2":   {"status": "complete", "output": ".claude/artifacts/KAN-XX/architecture.md"},
+    "3":   {"status": "complete", "output": ".claude/artifacts/KAN-XX/design-review.md"},
+    "4":   {"status": "complete", "output": ".claude/artifacts/KAN-XX/impl-plan.md"},
     "5":   {"status": "complete"},
-    "6":   {"status": "complete", "output": "docs/artifacts/KAN-XX/review_report.md"},
-    "7.1": {"status": "complete", "output": "docs/artifacts/KAN-XX/test-strategy.md", "confluence_url": "..."},
-    "7.2": {"status": "complete", "output": "docs/artifacts/KAN-XX/test-plan.md", "confluence_url": "..."},
-    "7.3": {"status": "complete", "output": "docs/artifacts/KAN-XX/test-cases.md", "confluence_url": "..."},
+    "6":   {"status": "complete", "output": ".claude/artifacts/KAN-XX/review_report.md"},
+    "7.1": {"status": "complete", "output": ".claude/artifacts/KAN-XX/test-strategy.md", "confluence_url": "..."},
+    "7.2": {"status": "complete", "output": ".claude/artifacts/KAN-XX/test-plan.md", "confluence_url": "..."},
+    "7.3": {"status": "complete", "output": ".claude/artifacts/KAN-XX/test-cases.md", "confluence_url": "..."},
     "7.4": {"status": "complete", "confluence_url": "...", "reports_dir": "reports/KAN-XX/"},
-    "7.5": {"status": "complete", "output": "docs/artifacts/KAN-XX/verification_report.md", "confluence_url": "..."},
+    "7.5": {"status": "complete", "output": ".claude/artifacts/KAN-XX/verification_report.md", "confluence_url": "..."},
     "8":   {"status": "pending"}
   },
   "feedback_loops": []
@@ -96,7 +96,7 @@ PR:        https://github.com/uppalashravanreddy/Flask-Task-Manager/pull/N
 Tests:     <unit_pass> unit | <int_pass> integration | <e2e_pass> E2E
 Reports:   reports/KAN-XX/index.html
 Confluence: <test-results-url>
-Artifacts: docs/artifacts/KAN-XX/
+Artifacts: .claude/artifacts/KAN-XX/
 ```
 
 ## Hard rules

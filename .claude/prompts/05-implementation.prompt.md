@@ -1,10 +1,10 @@
-# Phase 5 — Implementation Prompt
+﻿# Phase 5 — Implementation Prompt
 
 ## Context
 You are executing the implementation plan task by task.
 
 ## Input
-`docs/artifacts/<TICKET-ID>/impl-plan.md` and all upstream artifacts.
+`.claude/artifacts/<TICKET-ID>/impl-plan.md` and all upstream artifacts.
 
 ## Task
 Execute every task in impl-plan.md in dependency order:

@@ -1,4 +1,4 @@
----
+﻿---
 name: test-strategy
 description: Phase 7.1 agent. Reads requirements + architecture, designs the test approach, writes test-strategy.md locally and creates the Confluence page.
 ---
@@ -6,8 +6,8 @@ description: Phase 7.1 agent. Reads requirements + architecture, designs the tes
 You are the Test Strategy Agent (Phase 7.1).
 
 ## Input
-- `docs/artifacts/<TICKET-ID>/requirements.md`
-- `docs/artifacts/<TICKET-ID>/architecture.md`
+- `.claude/artifacts/<TICKET-ID>/requirements.md`
+- `.claude/artifacts/<TICKET-ID>/architecture.md`
 
 ## What you actually do
 
@@ -27,7 +27,7 @@ For each AC, choose the lowest-cost test type that gives adequate confidence:
 - DB schema changes / route behaviour → **integration**
 - Visual rendering / user flow / badge colours → **E2E (Playwright)**
 
-### Step 4 — Write `docs/artifacts/<TICKET-ID>/test-strategy.md`
+### Step 4 — Write `.claude/artifacts/<TICKET-ID>/test-strategy.md`
 
 Use this exact structure:
 
@@ -102,7 +102,7 @@ Store the returned page URL in `.sdlc/state.json` under `"phases": {"7.1": {"con
 
 ### Step 6 — Commit
 ```bash
-git add docs/artifacts/<TICKET-ID>/test-strategy.md
+git add .claude/artifacts/<TICKET-ID>/test-strategy.md
 git commit -m "docs(<TICKET-ID>): Phase 7.1 test strategy"
 ```
 

@@ -1,10 +1,10 @@
-# Skill: generate-docs
+﻿# Skill: generate-docs
 
 ## Purpose
-Write a phase artifact document to `docs/artifacts/<TICKET-ID>/` in the standard SDLC format.
+Write a phase artifact document to `.claude/artifacts/<TICKET-ID>/` in the standard SDLC format.
 
 ## Steps
-1. Confirm `docs/artifacts/<TICKET-ID>/` exists; create it if not.
+1. Confirm `.claude/artifacts/<TICKET-ID>/` exists; create it if not.
 2. Write the artifact file with the required sections for the phase (see individual phase prompts in `.claude/prompts/`).
 3. Always include the header table:
    ```markdown
@@ -16,7 +16,7 @@ Write a phase artifact document to `docs/artifacts/<TICKET-ID>/` in the standard
    | Author | Claude Code (Agentic SDLC) |
    | Date | <today> |
    ```
-4. Commit after writing: `git add docs/artifacts/<TICKET-ID>/ && git commit -m "docs(<TICKET-ID>): Phase <N> <name>"`
+4. Commit after writing: `git add .claude/artifacts/<TICKET-ID>/ && git commit -m "docs(<TICKET-ID>): Phase <N> <name>"`
 
 ## Quality rules
 - No empty sections — if data is not available, state why explicitly.

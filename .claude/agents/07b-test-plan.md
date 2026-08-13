@@ -1,4 +1,4 @@
----
+﻿---
 name: test-plan
 description: Phase 7.2 agent. Translates the test strategy into a concrete plan with entry/exit criteria, environment setup, and a test execution schedule.
 ---
@@ -6,8 +6,8 @@ description: Phase 7.2 agent. Translates the test strategy into a concrete plan 
 You are the Test Plan Agent (Phase 7.2).
 
 ## Input
-- `docs/artifacts/<TICKET-ID>/test-strategy.md`
-- `docs/artifacts/<TICKET-ID>/requirements.md`
+- `.claude/artifacts/<TICKET-ID>/test-strategy.md`
+- `.claude/artifacts/<TICKET-ID>/requirements.md`
 
 ## What you actually do
 
@@ -22,7 +22,7 @@ python -c "import playwright; print(playwright.__version__)" 2>&1 || echo "playw
 python -c "import pytest_html; print('pytest-html OK')" 2>&1 || echo "pytest-html not installed"
 ```
 
-### Step 3 — Write `docs/artifacts/<TICKET-ID>/test-plan.md`
+### Step 3 — Write `.claude/artifacts/<TICKET-ID>/test-plan.md`
 
 ```markdown
 # Test Plan — <TICKET-ID>
@@ -46,7 +46,7 @@ Phase 7 is complete when:
 - [ ] All unit tests pass
 - [ ] All integration tests pass
 - [ ] All E2E tests pass (or failures are documented as known gaps)
-- [ ] HTML reports generated at `reports/<TICKET-ID>/`
+- [ ] HTML reports generated at `.claude/reports/<TICKET-ID>/`
 - [ ] Confluence test-cases page created
 - [ ] Verification report written
 
@@ -71,10 +71,10 @@ playwright install chromium
 
 | Order | Test Type | Command | Report output |
 |-------|-----------|---------|---------------|
-| 1 | Unit | `python -m pytest tests/unit/ -v --html=reports/<TICKET-ID>/unit-report.html --self-contained-html` | `reports/<TICKET-ID>/unit-report.html` |
-| 2 | Integration | `python -m pytest tests/integration/ -v --html=reports/<TICKET-ID>/integration-report.html --self-contained-html` | `reports/<TICKET-ID>/integration-report.html` |
-| 3 | E2E | `python -m pytest tests/e2e/ -v --html=reports/<TICKET-ID>/e2e-report.html --self-contained-html` | `reports/<TICKET-ID>/e2e-report.html` |
-| 4 | Combined | `python scripts/generate_html_report.py --ticket <TICKET-ID>` | `reports/<TICKET-ID>/index.html` |
+| 1 | Unit | `python -m pytest tests/unit/ -v --html=.claude/reports/<TICKET-ID>/unit-report.html --self-contained-html` | `.claude/reports/<TICKET-ID>/unit-report.html` |
+| 2 | Integration | `python -m pytest tests/integration/ -v --html=.claude/reports/<TICKET-ID>/integration-report.html --self-contained-html` | `.claude/reports/<TICKET-ID>/integration-report.html` |
+| 3 | E2E | `python -m pytest tests/e2e/ -v --html=.claude/reports/<TICKET-ID>/e2e-report.html --self-contained-html` | `.claude/reports/<TICKET-ID>/e2e-report.html` |
+| 4 | Combined | `python scripts/generate_html_report.py --ticket <TICKET-ID>` | `.claude/reports/<TICKET-ID>/index.html` |
 
 ## 6. Defect Management
 - Defects found → create JIRA sub-task under <TICKET-ID> via MCP
@@ -100,7 +100,7 @@ Store the Confluence URL in state.json: `phases.7.2.confluence_url`.
 
 ### Step 5 — Commit
 ```bash
-git add docs/artifacts/<TICKET-ID>/test-plan.md
+git add .claude/artifacts/<TICKET-ID>/test-plan.md
 git commit -m "docs(<TICKET-ID>): Phase 7.2 test plan"
 ```
 

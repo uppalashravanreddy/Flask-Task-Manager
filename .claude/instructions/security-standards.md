@@ -19,7 +19,23 @@
 - Before adding any new package, check its PyPI page for known CVEs.
 - Pin versions in `requirements.txt` — do not use unbounded `>=` ranges for security-sensitive packages.
 
-## JIRA integration
-- JIRA REST API calls use HTTP Basic Auth with email + API key from `.env`.
+## JIRA + Confluence integration
+- JIRA/Confluence REST API calls use HTTP Basic Auth with email + API key from `.env`.
 - Never embed credentials in `scripts/jira_fetch.py` or any other source file.
 - `python-dotenv` loads credentials at runtime only.
+
+## GitHub integration
+- `GITHUB_PERSONAL_ACCESS_TOKEN` must be set in `.env` (never committed).
+- Required token scopes: `repo` (full) and `pull_requests` (read + write).
+- Generate at: https://github.com/settings/tokens/new
+- The token is loaded by `scripts/start-github-mcp.ps1` at MCP startup.
+- Never embed the token in agent files, prompts, or skills.
+
+## Required `.env` keys
+```
+JIRA_INSTANCE_URL=https://<instance>.atlassian.net
+JIRA_USER_EMAIL=your@email.com
+JIRA_API_KEY=<jira-api-token>
+GITHUB_PERSONAL_ACCESS_TOKEN=ghp_<token>
+SECRET_KEY=<optional-flask-secret>
+```

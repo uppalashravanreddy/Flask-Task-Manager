@@ -1,4 +1,4 @@
-# Skill: run-tests
+﻿# Skill: run-tests
 
 ## Purpose
 Run the test suite and generate HTML reports. Called by Phases 5, 7.4, and 7.5.
@@ -20,13 +20,13 @@ python -m pytest tests/unit/ tests/integration/ -v -q
 python -c "import os; os.makedirs('reports/<TICKET-ID>', exist_ok=True)"
 
 # Unit
-python -m pytest tests/unit/ -v --html=reports/<TICKET-ID>/unit-report.html --self-contained-html
+python -m pytest tests/unit/ -v --html=.claude/reports/<TICKET-ID>/unit-report.html --self-contained-html
 
 # Integration
-python -m pytest tests/integration/ -v --html=reports/<TICKET-ID>/integration-report.html --self-contained-html
+python -m pytest tests/integration/ -v --html=.claude/reports/<TICKET-ID>/integration-report.html --self-contained-html
 
 # E2E
-python -m pytest tests/e2e/ -v --html=reports/<TICKET-ID>/e2e-report.html --self-contained-html
+python -m pytest tests/e2e/ -v --html=.claude/reports/<TICKET-ID>/e2e-report.html --self-contained-html
 
 # Combined index
 python scripts/generate_html_report.py --ticket <TICKET-ID>
@@ -49,7 +49,7 @@ Test results: <N> passed, <M> failed, <K> errors
 Unit:        <n> passed
 Integration: <m> passed
 E2E:         <k> passed, <s> skipped
-Reports:     reports/<TICKET-ID>/index.html
+Reports:     .claude/reports/<TICKET-ID>/index.html
 ```
 
 ## If a test fails

@@ -1,4 +1,4 @@
-# Project Context
+﻿# Project Context
 
 ## What this project is
 Flask Task Manager — a CRUD web app for managing tasks. Stack:
@@ -19,7 +19,7 @@ Flask-Task-Manager/
   tests/unit/             # pytest unit tests
   tests/integration/      # pytest integration tests
   scripts/                # Utility scripts (migrations, JIRA fetch, hooks)
-  docs/artifacts/         # SDLC phase outputs, one sub-folder per ticket
+  .claude/artifacts/         # SDLC phase outputs, one sub-folder per ticket
   .claude/                # Claude Code config: agents, prompts, skills, instructions
   CHANGELOG.md            # Keep updated with every merged feature
   requirements.txt        # pip dependencies

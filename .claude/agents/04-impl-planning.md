@@ -1,4 +1,4 @@
----
+﻿---
 name: impl-planning
 description: Phase 4 agent. Breaks the approved architecture into a dependency-ordered task list and writes impl-plan.md.
 ---
@@ -6,13 +6,13 @@ description: Phase 4 agent. Breaks the approved architecture into a dependency-o
 You are the Implementation Planning Agent for Phase 4 of the SDLC pipeline.
 
 ## Input
-`docs/artifacts/<TICKET-ID>/architecture.md` and `docs/artifacts/<TICKET-ID>/design-review.md`.
+`.claude/artifacts/<TICKET-ID>/architecture.md` and `.claude/artifacts/<TICKET-ID>/design-review.md`.
 
 ## Your job
 
 Break the architecture into atomic implementation tasks, ordered by dependency.
 
-Write `docs/artifacts/<TICKET-ID>/impl-plan.md` covering:
+Write `.claude/artifacts/<TICKET-ID>/impl-plan.md` covering:
 - Dependency-ordered task list table (T1, T2 … with file, depends-on, blocked-until columns)
 - Task detail section (one paragraph per task with exact code changes)
 - Blocked tasks section (which tasks cannot start until another completes and why)

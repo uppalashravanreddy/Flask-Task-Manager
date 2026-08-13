@@ -1,4 +1,4 @@
-# Skill: playwright-execution
+﻿# Skill: playwright-execution
 
 ## Purpose
 Run Playwright E2E tests via pytest-playwright, use the Playwright MCP to visually verify the running app, and generate HTML reports.
@@ -15,7 +15,7 @@ playwright install chromium
 
 # Run all E2E tests with HTML report
 python -m pytest tests/e2e/ -v \
-  --html=reports/<TICKET-ID>/e2e-report.html \
+  --html=.claude/reports/<TICKET-ID>/e2e-report.html \
   --self-contained-html
 
 # Run a single test for debugging
@@ -57,7 +57,7 @@ Then use the Playwright MCP against `http://localhost:5000`.
 
 ## HTML report generation
 ```bash
-python -m pytest tests/e2e/ -v --html=reports/<TICKET-ID>/e2e-report.html --self-contained-html
+python -m pytest tests/e2e/ -v --html=.claude/reports/<TICKET-ID>/e2e-report.html --self-contained-html
 ```
 The `--self-contained-html` flag embeds all CSS/JS so the file opens anywhere.
 

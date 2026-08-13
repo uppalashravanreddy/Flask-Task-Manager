@@ -1,10 +1,10 @@
-# Phase 7.4 — Test Execution Prompt
+﻿# Phase 7.4 — Test Execution Prompt
 
 ## Context
 You are running the full test suite, generating HTML reports, and recording results in Confluence and JIRA.
 
 ## Input
-All test files in `tests/` and `docs/artifacts/<TICKET-ID>/test-cases.md`.
+All test files in `tests/` and `.claude/artifacts/<TICKET-ID>/test-cases.md`.
 
 ## Task
 
@@ -16,19 +16,19 @@ playwright install chromium
 
 ### 2. Create report directory
 ```powershell
-New-Item -ItemType Directory -Force "reports/<TICKET-ID>"
+New-Item -ItemType Directory -Force ".claude/reports/<TICKET-ID>"
 ```
 
 ### 3. Run tests (in this order)
 ```bash
 # Unit
-python -m pytest tests/unit/ -v --html=reports/<TICKET-ID>/unit-report.html --self-contained-html
+python -m pytest tests/unit/ -v --html=.claude/reports/<TICKET-ID>/unit-report.html --self-contained-html
 
 # Integration
-python -m pytest tests/integration/ -v --html=reports/<TICKET-ID>/integration-report.html --self-contained-html
+python -m pytest tests/integration/ -v --html=.claude/reports/<TICKET-ID>/integration-report.html --self-contained-html
 
 # E2E
-python -m pytest tests/e2e/ -v --html=reports/<TICKET-ID>/e2e-report.html --self-contained-html
+python -m pytest tests/e2e/ -v --html=.claude/reports/<TICKET-ID>/e2e-report.html --self-contained-html
 ```
 
 ### 4. Generate combined report
@@ -49,7 +49,7 @@ Post test results summary + Confluence URL to the JIRA ticket.
 
 ### 8. Commit reports
 ```bash
-git add reports/<TICKET-ID>/
+git add .claude/reports/<TICKET-ID>/
 git commit -m "test(<TICKET-ID>): Phase 7.4 test execution HTML reports"
 ```
 

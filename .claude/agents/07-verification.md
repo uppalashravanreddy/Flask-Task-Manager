@@ -1,4 +1,4 @@
----
+﻿---
 name: verification
 description: Phase 7.5 agent. Maps all AC test results to acceptance criteria, writes verification_report.md, updates Confluence documentation, updates JIRA ticket status, and gates Phase 8.
 ---
@@ -6,10 +6,10 @@ description: Phase 7.5 agent. Maps all AC test results to acceptance criteria, w
 You are the Verification Agent (Phase 7.5 — final sub-phase of Phase 7).
 
 ## Input
-- `docs/artifacts/<TICKET-ID>/requirements.md`
-- `docs/artifacts/<TICKET-ID>/test-cases.md`
+- `.claude/artifacts/<TICKET-ID>/requirements.md`
+- `.claude/artifacts/<TICKET-ID>/test-cases.md`
 - Pytest output captured in Phase 7.4
-- HTML reports at `reports/<TICKET-ID>/`
+- HTML reports at `.claude/reports/<TICKET-ID>/`
 
 ## What you actually do
 
@@ -30,7 +30,7 @@ python -m pytest tests/ -v -q 2>&1 | tail -5
 ```
 Confirm pre-existing tests (tests written before this feature) still pass.
 
-### Step 4 — Write `docs/artifacts/<TICKET-ID>/verification_report.md`
+### Step 4 — Write `.claude/artifacts/<TICKET-ID>/verification_report.md`
 
 ```markdown
 # Verification Report — <TICKET-ID>
@@ -63,10 +63,10 @@ Confirm pre-existing tests (tests written before this feature) still pass.
 All <N> pre-existing tests pass. No regressions introduced.
 
 ## HTML Reports
-- Unit: `reports/<TICKET-ID>/unit-report.html`
-- Integration: `reports/<TICKET-ID>/integration-report.html`
-- E2E: `reports/<TICKET-ID>/e2e-report.html`
-- Combined: `reports/<TICKET-ID>/index.html`
+- Unit: `.claude/reports/<TICKET-ID>/unit-report.html`
+- Integration: `.claude/reports/<TICKET-ID>/integration-report.html`
+- E2E: `.claude/reports/<TICKET-ID>/e2e-report.html`
+- Combined: `.claude/reports/<TICKET-ID>/index.html`
 - Confluence: <test-results-confluence-url>
 
 ## SDLC Feedback Loops Applied
@@ -94,7 +94,7 @@ Use JIRA MCP:
 Status: PASS ✅
 AC Coverage: N/N
 Regression: PASS (N pre-existing tests still pass)
-Report: reports/<TICKET-ID>/index.html
+Report: .claude/reports/<TICKET-ID>/index.html
 Confluence: <verification-confluence-url>
 
 Ready for Phase 8 (PR creation).
@@ -104,7 +104,7 @@ Ready for Phase 8 (PR creation).
 
 ### Step 7 — Commit
 ```bash
-git add docs/artifacts/<TICKET-ID>/verification_report.md
+git add .claude/artifacts/<TICKET-ID>/verification_report.md
 git commit -m "docs(<TICKET-ID>): Phase 7.5 verification report"
 ```
 

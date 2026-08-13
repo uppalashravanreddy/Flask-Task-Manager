@@ -1,4 +1,4 @@
-# Flask Task Manager — Claude Code SDLC Pipeline
+﻿# Flask Task Manager — Claude Code SDLC Pipeline
 
 ## How to start a new feature
 
@@ -46,13 +46,13 @@ Phase 7 runs as 5 sequential sub-phases, each producing a real artifact and upda
 | 7.1 Test Strategy | `07a-test-strategy` | `test-strategy.md` | Created |
 | 7.2 Test Plan | `07b-test-plan` | `test-plan.md` | Created |
 | 7.3 Test Cases | `07c-test-cases` | `test-cases.md` + new test files | Created + JIRA comment |
-| 7.4 Test Execution | `07d-test-execution` | HTML reports in `reports/<TICKET-ID>/` | Updated + JIRA comment |
+| 7.4 Test Execution | `07d-test-execution` | HTML reports in `.claude/reports/<TICKET-ID>/` | Updated + JIRA comment |
 | 7.5 Verification | `07-verification` | `verification_report.md` | Updated + JIRA transition |
 
 ### HTML reports
 ```bash
 python scripts/generate_html_report.py --ticket <TICKET-ID>
-# writes: reports/<TICKET-ID>/index.html
+# writes: .claude/reports/<TICKET-ID>/index.html
 ```
 Opens as a standalone page with links to unit / integration / E2E sub-reports.
 
@@ -64,24 +64,28 @@ Use skill: `review-test-cases` to review for duplicates.
 
 ## MCP servers
 
-| Server | Package | Handles |
-|--------|---------|---------|
-| `atlassian` | `@sooperset/mcp-atlassian` | JIRA (stories, comments, transitions) + Confluence (pages) |
-| `playwright` | `@playwright/mcp` | Browser navigation + visual verification |
+| Server | Package | Script | Handles |
+|--------|---------|--------|---------|
+| `atlassian` | `@sooperset/mcp-atlassian` | `scripts/start-jira-mcp.ps1` | JIRA (stories, comments, transitions) + Confluence (pages) |
+| `github` | `@modelcontextprotocol/server-github` | `scripts/start-github-mcp.ps1` | Create PRs, push files, create issues, comment on PRs |
+| `playwright` | `@playwright/mcp` | (npx, no wrapper needed) | Browser navigation + visual verification |
 
-Credentials live in `.env` (not committed). Both servers start automatically in VS Code.
+Credentials live in `.env` (not committed). All three servers start automatically in VS Code.
 
 Manual start:
 ```powershell
-.\scripts\start-jira-mcp.ps1    # starts atlassian MCP
-npx @playwright/mcp@latest      # starts playwright MCP
+.\scripts\start-jira-mcp.ps1     # starts atlassian MCP
+.\scripts\start-github-mcp.ps1   # starts github MCP
+npx @playwright/mcp@latest        # starts playwright MCP
 ```
+
+Required `.env` keys: `JIRA_INSTANCE_URL`, `JIRA_USER_EMAIL`, `JIRA_API_KEY`, `GITHUB_PERSONAL_ACCESS_TOKEN`
 
 ## State management
 
 Pipeline state is tracked in `.sdlc/state.json` (auto-created, phase sub-keys: `7.1` through `7.5`).
-Phase artifacts are written to `docs/artifacts/<TICKET-ID>/`.
-HTML reports are written to `reports/<TICKET-ID>/`.
+Phase artifacts are written to `.claude/artifacts/<TICKET-ID>/`.
+HTML reports are written to `.claude/reports/<TICKET-ID>/`.
 Confluence URLs are stored in `state.json` per phase.
 
 ## Skills reference

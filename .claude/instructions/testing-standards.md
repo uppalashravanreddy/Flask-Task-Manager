@@ -1,4 +1,4 @@
-# Testing Standards
+﻿# Testing Standards
 
 ## Test directory layout
 ```
@@ -16,9 +16,9 @@ tests/
 python -m pytest tests/unit/ tests/integration/ -v -q
 
 # Full with HTML reports (Phase 7.4)
-python -m pytest tests/unit/ -v --html=reports/<TICKET-ID>/unit-report.html --self-contained-html
-python -m pytest tests/integration/ -v --html=reports/<TICKET-ID>/integration-report.html --self-contained-html
-python -m pytest tests/e2e/ -v --html=reports/<TICKET-ID>/e2e-report.html --self-contained-html
+python -m pytest tests/unit/ -v --html=.claude/reports/<TICKET-ID>/unit-report.html --self-contained-html
+python -m pytest tests/integration/ -v --html=.claude/reports/<TICKET-ID>/integration-report.html --self-contained-html
+python -m pytest tests/e2e/ -v --html=.claude/reports/<TICKET-ID>/e2e-report.html --self-contained-html
 python scripts/generate_html_report.py --ticket <TICKET-ID>
 ```
 
@@ -57,14 +57,14 @@ If a test already covers the same assertion → reference it, don't duplicate.
 
 ## Phase 7 testing sub-pipeline artifacts
 Each story produces:
-- `docs/artifacts/<TICKET-ID>/test-strategy.md`
-- `docs/artifacts/<TICKET-ID>/test-plan.md`
-- `docs/artifacts/<TICKET-ID>/test-cases.md`
-- `reports/<TICKET-ID>/unit-report.html`
-- `reports/<TICKET-ID>/integration-report.html`
-- `reports/<TICKET-ID>/e2e-report.html`
-- `reports/<TICKET-ID>/index.html`
-- `docs/artifacts/<TICKET-ID>/verification_report.md`
+- `.claude/artifacts/<TICKET-ID>/test-strategy.md`
+- `.claude/artifacts/<TICKET-ID>/test-plan.md`
+- `.claude/artifacts/<TICKET-ID>/test-cases.md`
+- `.claude/reports/<TICKET-ID>/unit-report.html`
+- `.claude/reports/<TICKET-ID>/integration-report.html`
+- `.claude/reports/<TICKET-ID>/e2e-report.html`
+- `.claude/reports/<TICKET-ID>/index.html`
+- `.claude/artifacts/<TICKET-ID>/verification_report.md`
 
 ## Confluence
 - Every test artifact is pushed to Confluence using `confluence-sync` skill.

@@ -1,14 +1,14 @@
-# Phase 8 — PR Description Prompt
+﻿# Phase 8 — PR Description Prompt
 
 ## Context
 You are completing the SDLC cycle by creating the Pull Request.
 
 ## Input
-All phase artifacts from `docs/artifacts/<TICKET-ID>/` and the git diff.
+All phase artifacts from `.claude/artifacts/<TICKET-ID>/` and the git diff.
 
 ## Task
 
-### 1. Write `docs/artifacts/<TICKET-ID>/pr-description.md` with ALL sections:
+### 1. Write `.claude/artifacts/<TICKET-ID>/pr-description.md` with ALL sections:
 - **Summary** — 2–3 sentences: what was built and why
 - **Changes Made** — table: file, action, reason
 - **Test Evidence** — full pytest output from Phase 7
@@ -25,7 +25,7 @@ Add an entry under `## [Unreleased]` or a new version heading:
 
 ### 3. Commit all artifacts
 ```bash
-git add docs/artifacts/<TICKET-ID>/
+git add .claude/artifacts/<TICKET-ID>/
 git add <all changed source files>
 git add CHANGELOG.md
 git commit -m "feat(<TICKET-ID>): <one-line summary from requirements>"
@@ -35,7 +35,7 @@ git commit -m "feat(<TICKET-ID>): <one-line summary from requirements>"
 ```bash
 gh pr create \
   --title "<TICKET-ID>: <story summary>" \
-  --body-file docs/artifacts/<TICKET-ID>/pr-description.md \
+  --body-file .claude/artifacts/<TICKET-ID>/pr-description.md \
   --base main \
   --head <current-branch>
 ```

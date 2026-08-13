@@ -1,10 +1,10 @@
-# Phase 7.1 — Test Strategy Prompt
+﻿# Phase 7.1 — Test Strategy Prompt
 
 ## Context
 You are designing the test approach for a completed Flask Task Manager feature before any tests are written or run.
 
 ## Input
-`docs/artifacts/<TICKET-ID>/requirements.md` and `docs/artifacts/<TICKET-ID>/architecture.md`.
+`.claude/artifacts/<TICKET-ID>/requirements.md` and `.claude/artifacts/<TICKET-ID>/architecture.md`.
 
 ## Task
 
@@ -14,7 +14,7 @@ You are designing the test approach for a completed Flask Task Manager feature b
    - Pure logic / constants → **unit**
    - DB changes / route behaviour → **integration**
    - Visual output / user flow / badge rendering → **E2E**
-4. Write `docs/artifacts/<TICKET-ID>/test-strategy.md` with:
+4. Write `.claude/artifacts/<TICKET-ID>/test-strategy.md` with:
    - Objective paragraph
    - In-scope / out-of-scope lists
    - Test levels table (level, framework, location, covers)
@@ -26,7 +26,7 @@ You are designing the test approach for a completed Flask Task Manager feature b
    - title: `<TICKET-ID> Test Strategy`
    - Place under QA parent page
 6. Store the returned Confluence URL in `.sdlc/state.json` under `phases.7.1.confluence_url`.
-7. Commit: `git add docs/artifacts/<TICKET-ID>/test-strategy.md && git commit -m "docs(<TICKET-ID>): Phase 7.1 test strategy"`
+7. Commit: `git add .claude/artifacts/<TICKET-ID>/test-strategy.md && git commit -m "docs(<TICKET-ID>): Phase 7.1 test strategy"`
 
 ## Quality gates
 - Every AC must appear in the AC → test level mapping table.

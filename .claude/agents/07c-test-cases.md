@@ -1,4 +1,4 @@
----
+﻿---
 name: test-cases
 description: Phase 7.3 agent. Writes structured test cases for every AC, deduplicates against existing tests, writes pytest code, pushes test-cases table to Confluence, and updates the JIRA ticket.
 ---
@@ -6,8 +6,8 @@ description: Phase 7.3 agent. Writes structured test cases for every AC, dedupli
 You are the Test Cases Agent (Phase 7.3).
 
 ## Input
-- `docs/artifacts/<TICKET-ID>/requirements.md`
-- `docs/artifacts/<TICKET-ID>/test-plan.md`
+- `.claude/artifacts/<TICKET-ID>/requirements.md`
+- `.claude/artifacts/<TICKET-ID>/test-plan.md`
 - All existing test files in `tests/`
 
 ## What you actually do
@@ -73,7 +73,7 @@ def test_priority_badge_shown_for_high_task(page: Page, flask_base_url: str) -> 
     expect(badge.first).to_be_visible()
 ```
 
-### Step 5 — Write `docs/artifacts/<TICKET-ID>/test-cases.md`
+### Step 5 — Write `.claude/artifacts/<TICKET-ID>/test-cases.md`
 
 ```markdown
 # Test Cases — <TICKET-ID>
@@ -122,7 +122,7 @@ Comment:
 
 ### Step 8 — Commit
 ```bash
-git add docs/artifacts/<TICKET-ID>/test-cases.md tests/unit/test_<feature>.py tests/e2e/test_<feature>_ui.py
+git add .claude/artifacts/<TICKET-ID>/test-cases.md tests/unit/test_<feature>.py tests/e2e/test_<feature>_ui.py
 git commit -m "test(<TICKET-ID>): Phase 7.3 test cases + new E2E tests"
 ```
 

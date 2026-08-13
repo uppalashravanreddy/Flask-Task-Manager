@@ -1,10 +1,10 @@
-# Phase 7 — Verification Prompt
+﻿# Phase 7 — Verification Prompt
 
 ## Context
 You are verifying both the code and the output quality before creating the PR.
 
 ## Input
-All test files, `docs/artifacts/<TICKET-ID>/requirements.md`, and any generated output documents.
+All test files, `.claude/artifacts/<TICKET-ID>/requirements.md`, and any generated output documents.
 
 ## Task
 
@@ -32,4 +32,4 @@ If the feature generates a document (e.g. Markdown report, CSV, HTML):
 ANY test failure → BLOCKED → return to Phase 5. Do not modify tests to force a pass.
 
 ## Commit
-`git add docs/artifacts/<TICKET-ID>/verification_report.md && git commit -m "docs(<TICKET-ID>): Phase 7 verification"`
+`git add .claude/artifacts/<TICKET-ID>/verification_report.md && git commit -m "docs(<TICKET-ID>): Phase 7 verification"`

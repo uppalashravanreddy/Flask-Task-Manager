@@ -1,4 +1,4 @@
-# Pull Request Description — FLASK-002: Task Priority
+﻿# Pull Request Description — FLASK-002: Task Priority
 
 | Field     | Value                                    |
 |-----------|------------------------------------------|
@@ -30,12 +30,12 @@ Adds a three-level task priority system (High / Medium / Low) to the Flask Task 
 | `scripts/migrate_add_priority.py` | Created | Safe, idempotent SQLite migration — adds column and backfills NULLs |
 | `tests/unit/test_priority.py` | Created | 6 unit tests covering sort order, unknown priority fallback, choices consistency |
 | `tests/integration/test_priority_migration.py` | Created | 4 integration tests covering migration add, backfill, idempotency, post-migration inserts |
-| `docs/artifacts/FLASK-002/requirements.md` | Created | Phase 1 SDLC artifact |
-| `docs/artifacts/FLASK-002/architecture.md` | Created | Phase 2 SDLC artifact |
-| `docs/artifacts/FLASK-002/design-review.md` | Created | Phase 3 SDLC artifact — caught Bootstrap version mismatch before implementation |
-| `docs/artifacts/FLASK-002/impl-plan.md` | Created | Phase 4 SDLC artifact |
-| `docs/artifacts/FLASK-002/review_report.md` | Created | Phase 6 SDLC artifact |
-| `docs/artifacts/FLASK-002/verification_report.md` | Created | Phase 7 SDLC artifact |
+| `.claude/artifacts/FLASK-002/requirements.md` | Created | Phase 1 SDLC artifact |
+| `.claude/artifacts/FLASK-002/architecture.md` | Created | Phase 2 SDLC artifact |
+| `.claude/artifacts/FLASK-002/design-review.md` | Created | Phase 3 SDLC artifact — caught Bootstrap version mismatch before implementation |
+| `.claude/artifacts/FLASK-002/impl-plan.md` | Created | Phase 4 SDLC artifact |
+| `.claude/artifacts/FLASK-002/review_report.md` | Created | Phase 6 SDLC artifact |
+| `.claude/artifacts/FLASK-002/verification_report.md` | Created | Phase 7 SDLC artifact |
 
 ---
 

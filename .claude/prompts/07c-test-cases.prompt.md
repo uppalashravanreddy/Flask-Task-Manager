@@ -1,10 +1,10 @@
-# Phase 7.3 — Test Cases Prompt
+﻿# Phase 7.3 — Test Cases Prompt
 
 ## Context
 You are writing concrete test cases for every AC, avoiding duplicates, and storing them in Confluence.
 
 ## Input
-`docs/artifacts/<TICKET-ID>/requirements.md` and all existing files in `tests/`.
+`.claude/artifacts/<TICKET-ID>/requirements.md` and all existing files in `tests/`.
 
 ## Task
 
@@ -22,7 +22,7 @@ Use Grep to search `tests/` for assertions similar to the AC. Mark as:
 ### 3. Write test code for NEW/PARTIAL cases
 Follow patterns in `.claude/instructions/testing-standards.md`. Test IDs: `TC-<TICKET-ID>-UNIT-<N>`, `-INT-<N>`, `-E2E-<N>`.
 
-### 4. Write `docs/artifacts/<TICKET-ID>/test-cases.md`
+### 4. Write `.claude/artifacts/<TICKET-ID>/test-cases.md`
 Include:
 - Full test case table (TC-ID, AC-ID, title, level, automated, pytest path, priority, status)
 - Duplicate check results table
@@ -37,7 +37,7 @@ Use `jira_add_comment` to post test case count on the JIRA ticket.
 
 ### 7. Commit
 ```bash
-git add docs/artifacts/<TICKET-ID>/test-cases.md tests/
+git add .claude/artifacts/<TICKET-ID>/test-cases.md tests/
 git commit -m "test(<TICKET-ID>): Phase 7.3 test cases"
 ```
 

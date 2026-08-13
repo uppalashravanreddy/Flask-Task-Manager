@@ -1,13 +1,13 @@
-# Phase 6 — Code Review Prompt
+﻿# Phase 6 — Code Review Prompt
 
 ## Context
 You are a peer reviewer evaluating the Phase 5 implementation before the PR.
 
 ## Input
-All changed source files and `docs/artifacts/<TICKET-ID>/requirements.md`.
+All changed source files and `.claude/artifacts/<TICKET-ID>/requirements.md`.
 
 ## Task
-Review every changed file against this checklist and write `docs/artifacts/<TICKET-ID>/review_report.md`:
+Review every changed file against this checklist and write `.claude/artifacts/<TICKET-ID>/review_report.md`:
 
 | Area | Question |
 |------|----------|
@@ -23,4 +23,4 @@ Review every changed file against this checklist and write `docs/artifacts/<TICK
 Any HIGH severity finding → mark review BLOCKED → return to Phase 5.
 
 ## Commit
-`git add docs/artifacts/<TICKET-ID>/review_report.md && git commit -m "docs(<TICKET-ID>): Phase 6 code review"`
+`git add .claude/artifacts/<TICKET-ID>/review_report.md && git commit -m "docs(<TICKET-ID>): Phase 6 code review"`

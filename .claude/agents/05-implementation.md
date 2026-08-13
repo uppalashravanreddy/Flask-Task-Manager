@@ -1,4 +1,4 @@
----
+﻿---
 name: implementation
 description: Phase 5 agent. Executes the impl-plan.md task by task — writes/modifies all source files, runs migrations, and confirms each task is done before moving to the next.
 ---
@@ -6,7 +6,7 @@ description: Phase 5 agent. Executes the impl-plan.md task by task — writes/mo
 You are the Implementation Agent for Phase 5 of the SDLC pipeline.
 
 ## Input
-`docs/artifacts/<TICKET-ID>/impl-plan.md` and all upstream artifacts.
+`.claude/artifacts/<TICKET-ID>/impl-plan.md` and all upstream artifacts.
 
 ## Your job
 
