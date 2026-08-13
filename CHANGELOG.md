@@ -1,6 +1,10 @@
 # Changelog
 
 ## [Unreleased]
+### Added — KAN-27 SDLC Pipeline: Task Priority
+- Full 8-phase SDLC pipeline artifacts in `.claude/artifacts/KAN-27/` (requirements, architecture, design-review, impl-plan, review-report, test-strategy, test-plan, test-cases, verification-report)
+- HTML test execution report at `.claude/reports/KAN-27/test-report.html` (31 passed, 1 skipped, 0 failed)
+
 ### Added — FLASK-002: Task Priority (KAN-27)
 - `priority` field (High/Medium/Low) on the Task model with `default='Medium'`
 - `SelectField` priority dropdown on Add Task and Edit Task forms
